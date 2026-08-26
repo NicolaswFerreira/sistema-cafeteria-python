@@ -1,0 +1,485 @@
+
+#  Sistema de Gerenciamento de Cafeteria
+
+Sistema de gerenciamento desenvolvido em **Python** como projeto acadêmico, com o objetivo de simular as principais operações de uma cafeteria, incluindo cadastro de clientes, realização de vendas, controle de produtos, ingredientes, estoque e sistema de fidelidade.
+
+
+## Sobre o projeto
+
+O **Sistema de Gerenciamento de Cafeteria** foi desenvolvido para colocar em prática os conceitos de programação estudados durante a disciplina de Python.
+
+O projeto começou a partir de um **pseudocódigo**, utilizado para organizar as ideias, definir as funcionalidades e visualizar o funcionamento do sistema antes da implementação.
+A partir dessa estrutura inicial, o pseudocódigo foi gradualmente transformado em código Python. O desenvolvimento aconteceu em paralelo com as videoaulas da disciplina, permitindo que novos conhecimentos fossem incorporados ao sistema conforme eram aprendidos.
+O resultado é uma aplicação capaz de controlar:
+
+*  Produtos da cafeteria
+*  Clientes
+*  Ingredientes
+*  Pedidos
+*  Vendas
+*  Estoque de produtos
+*  Estoque de ingredientes
+*  Sistema de pontos
+*  Cafés gratuitos
+*  Persistência de dados por arquivos CSV
+
+---
+
+#  Funcionalidades
+
+O sistema possui um menu principal com as seguintes opções:
+
+```text
+====================================
+       SISTEMA DA CAFETERIA
+====================================
+
+1 - Iniciar venda
+2 - Buscar venda
+3 - Cadastrar cliente
+4 - Buscar cliente
+5 - Consultas
+0 - Encerrar sistema
+```
+
+###  Realização de vendas
+
+Durante uma venda, o sistema:
+
+1. Solicita o código do cliente;
+2. Verifica se o cliente está cadastrado;
+3. Permite cadastrar um novo cliente caso ele não seja encontrado;
+4. Exibe o cardápio de produtos;
+5. Permite selecionar produtos pelo código;
+6. Solicita a quantidade desejada;
+7. Verifica a disponibilidade no estoque;
+8. Verifica a disponibilidade dos ingredientes;
+9. Calcula o subtotal de cada item;
+10. Calcula o valor total do pedido;
+11. Exibe um resumo da venda;
+12. Permite confirmar ou cancelar a operação.
+
+Caso a venda seja cancelada, ela não é registrada e os estoques não são alterados.
+
+---
+
+#  Controle de estoque
+
+O sistema possui dois níveis de controle de estoque:
+
+### Estoque de produtos
+
+Cada produto possui:
+
+```python
+{
+    "codigo": "P001",
+    "nome": "Café Espresso Pequeno",
+    "preco": 4.00,
+    "estoque": 20
+}
+```
+
+Quando uma venda é confirmada, a quantidade vendida é descontada do estoque do produto.
+
+### Estoque de ingredientes
+
+Os produtos também possuem uma relação com os ingredientes utilizados em sua preparação.
+
+Por exemplo:
+
+```python
+{
+    "codigo": "P001",
+    "nome": "Café Espresso Pequeno",
+    "preco": 4.00,
+    "estoque": 20,
+    "ingredientes": {
+        "cafe_pó": 1,
+        "acucar": 1
+    }
+}
+```
+
+Assim, uma venda de **2 cafés** gera:
+
+```text
+2 × café_pó
+2 × açúcar
+```
+
+Dessa forma, o sistema atualiza tanto o estoque do produto quanto os estoques dos ingredientes utilizados.
+
+---
+
+# Sistema de fidelidade
+
+O sistema possui um mecanismo simples de pontuação para os clientes.
+
+A cada venda confirmada, o cliente recebe **1 ponto**.
+
+Ao atingir **5 pontos**, o cliente recebe **1 café espresso grátis**.
+
+```text
+5 pontos
+   ↓
+1 café grátis
+   ↓
+pontos retornam para 0
+```
+
+A quantidade de cafés gratuitos também fica registrada no cadastro do cliente.
+
+---
+
+# Cadastro de clientes
+
+Cada cliente é armazenado com informações como:
+
+```python
+{
+    "codigo": "C001",
+    "nome": "Nicolas Ferreira",
+    "pontos": 0,
+    "cafes_gratis": 0
+}
+```
+
+O sistema permite:
+
+* cadastrar clientes;
+* gerar códigos automaticamente;
+* buscar clientes pelo código;
+* consultar todos os clientes;
+* acompanhar os pontos;
+* controlar os cafés gratuitos.
+
+---
+
+# Estrutura do código
+
+Uma das principais evoluções do projeto foi a utilização de **funções** para separar as responsabilidades do sistema.
+
+Em vez de concentrar todo o código dentro do menu principal, as funcionalidades foram divididas em funções específicas.
+
+Entre elas estão:
+
+```python
+iniciar_venda()
+buscar_produto()
+buscar_cliente()
+buscar_venda()
+buscar_ingrediente()
+mostrar_produtos()
+mostrar_clientes()
+mostrar_vendas()
+consultas()
+menu_principal()
+```
+
+Essa divisão facilita a leitura, manutenção e compreensão do programa, pois cada função possui uma responsabilidade específica.
+
+---
+
+# Funcionamento do menu
+
+O menu principal utiliza uma estrutura de repetição `while`.
+
+De forma simplificada, o funcionamento é:
+
+```text
+Início
+   ↓
+Menu principal
+   ↓
+Usuário escolhe uma opção
+   ↓
+Executa a funcionalidade correspondente
+   ↓
+Retorna ao menu principal
+   ↓
+Continua executando
+   ↓
+Usuário escolhe 0
+   ↓
+Sistema encerrado
+```
+
+---
+
+# Estrutura dos pedidos
+
+Cada item adicionado a um pedido é armazenado como um dicionário contendo informações como:
+
+```python
+{
+    "produto": "P001",
+    "nome": "Café Espresso Pequeno",
+    "quantidade": 2,
+    "preco": 4.00,
+    "subtotal": 8.00
+}
+```
+
+Os itens são armazenados em uma lista chamada `pedido`.
+
+O valor total é calculado a partir da soma dos subtotais:
+
+```text
+Subtotal do item 1
+        +
+Subtotal do item 2
+        +
+Subtotal do item 3
+        =
+Valor total da venda
+```
+
+---
+
+# Registro das vendas
+
+Após a confirmação de uma venda, o sistema gera um código para identificá-la:
+
+```text
+V001
+V002
+V003
+...
+```
+
+Cada venda registra informações como:
+
+* código da venda;
+* cliente;
+* produtos comprados;
+* quantidade;
+* valor total.
+
+O sistema também permite consultar as vendas realizadas e visualizar o faturamento total.
+
+---
+
+# Persistência dos dados com CSV
+
+Durante a evolução do projeto, foi incorporado o uso de **arquivos CSV** para permitir que os dados continuassem disponíveis mesmo após o encerramento do programa.
+
+O sistema utiliza arquivos separados para organizar diferentes tipos de informação:
+
+```text
+clientes.csv
+produtos.csv
+ingredientes.csv
+vendas.csv
+itens_venda.csv
+```
+
+O módulo utilizado para trabalhar com esses arquivos é:
+
+```python
+import csv
+```
+
+A utilização dos arquivos CSV representa uma evolução importante em relação à versão inicial, na qual os dados permaneciam somente na memória durante a execução do programa.
+
+---
+
+# Evolução do desenvolvimento
+
+O desenvolvimento do sistema aconteceu de forma gradual.
+
+### 1. Pseudocódigo
+
+O primeiro passo foi criar um pseudocódigo para organizar as ideias e definir:
+
+* quais dados seriam necessários;
+* quais funcionalidades o sistema teria;
+* como seria o fluxo de uma venda;
+* quais informações precisariam ser armazenadas.
+
+O pseudocódigo serviu como uma espécie de planejamento inicial antes da implementação.
+
+### 2. Primeira implementação em Python
+
+Depois, a estrutura foi transformada em Python utilizando inicialmente conceitos como:
+
+* variáveis;
+* `if`;
+* `elif`;
+* `else`;
+* `while`;
+* `for`;
+* listas;
+* dicionários.
+
+Nesse momento, o sistema ainda era mais simples e concentrava grande parte da lógica diretamente no programa principal.
+
+### 3. Desenvolvimento paralelo às videoaulas
+
+O projeto foi sendo desenvolvido paralelamente ao acompanhamento das videoaulas.
+
+Conforme novos conceitos eram apresentados, eles eram incorporados ao sistema, permitindo que o projeto evoluísse junto com o aprendizado.
+
+Posteriormente foram adicionados conceitos como:
+
+* `def`;
+* `try`;
+* `except`;
+* `open()`;
+* manipulação de arquivos;
+* módulo `csv`.
+
+### 4. Correção dos problemas do menu
+
+Um dos primeiros problemas encontrados ocorreu no **menu principal**, principalmente na opção de iniciar uma venda.
+
+A estrutura dos comandos condicionais e dos laços de repetição chegou a ficar duplicada, além de problemas de indentação que impediam o funcionamento correto da opção.
+
+A correção desse problema ajudou a compreender melhor a importância da organização dos blocos de código e da utilização correta de `while`, `if`, `elif` e `else`.
+
+### 5. Problema no estoque de ingredientes
+
+Depois que o processo de vendas passou a funcionar corretamente, surgiu outro problema.
+
+Inicialmente, o sistema conseguia diminuir o estoque do produto vendido, mas os ingredientes utilizados para preparar aquele produto não eram automaticamente descontados.
+
+Foi então criada uma relação entre produtos e ingredientes.
+
+Por exemplo:
+
+```text
+Café Espresso Pequeno
+        ↓
+   café_pó + açúcar
+```
+
+Assim, quando uma venda é confirmada, o sistema consegue identificar os ingredientes utilizados e realizar a baixa correspondente.
+
+### 6. Funções e organização
+
+Com a evolução do projeto, as funcionalidades foram separadas em funções.
+
+Isso reduziu a concentração de código no menu principal e tornou o programa mais organizado.
+
+### 7. Persistência com CSV
+
+Por fim, foi incorporado o armazenamento em arquivos CSV, permitindo que os dados fossem preservados e carregados novamente durante novas execuções do sistema.
+
+---
+
+# Demonstração do funcionamento
+
+Os testes realizados no terminal demonstram algumas das principais funcionalidades do sistema.
+
+### Menu principal
+
+O sistema apresenta as opções disponíveis para o usuário.
+
+### Cadastro de cliente
+
+É possível cadastrar novos clientes e gerar automaticamente um código.
+
+### Realização de venda
+
+O usuário seleciona o cliente, escolhe os produtos e informa as quantidades.
+
+### Confirmação da venda
+
+Antes de finalizar, o sistema apresenta o resumo do pedido e permite confirmar ou cancelar.
+
+### Atualização do estoque
+
+Após a confirmação, o estoque do produto e dos ingredientes utilizados é atualizado.
+
+### Consulta de clientes
+
+O sistema permite visualizar os clientes cadastrados e seus respectivos pontos.
+
+### Consulta de vendas
+
+É possível visualizar as vendas realizadas e o faturamento total.
+
+### Consulta de ingredientes
+
+O sistema apresenta a quantidade disponível de cada ingrediente.
+
+### Consulta de produtos
+
+Também é possível consultar o estoque e os preços dos produtos.
+
+---
+
+# Conceitos de Python utilizados
+
+O projeto permitiu aplicar diversos conceitos estudados durante a disciplina:
+
+* Variáveis;
+* Tipos de dados;
+* Operadores;
+* Estruturas condicionais;
+* `if`, `elif` e `else`;
+* Estruturas de repetição;
+* `for`;
+* `while`;
+* Listas;
+* Dicionários;
+* Funções;
+* Parâmetros e retornos;
+* Tratamento de exceções com `try` e `except`;
+* Manipulação de arquivos;
+* `open()`;
+* Arquivos CSV;
+* Módulo `csv`;
+* Organização de código.
+
+---
+
+# Como executar
+
+Para executar o projeto, é necessário ter o **Python** instalado.
+
+Clone o repositório:
+
+```bash
+git clone https://github.com/NicolaswFerreira/Coffe_Shops__Rosa.git
+```
+
+Entre na pasta:
+
+```bash
+cd Coffe_Shops__Rosa
+```
+
+Execute o programa:
+
+```bash
+python cafeteria.py
+```
+
+> Caso o arquivo principal possua outro nome, substitua `cafeteria.py` pelo nome correspondente.
+
+---
+
+# Conclusão e aprendizados
+
+O desenvolvimento do Sistema de Gerenciamento de Cafeteria permitiu acompanhar, na prática, a evolução de um programa desde uma ideia inicial até uma aplicação mais estruturada.
+
+O projeto começou com um pseudocódigo, utilizado para organizar a lógica e compreender quais funcionalidades seriam necessárias. A partir disso, o sistema foi desenvolvido gradualmente em Python e aprimorado conforme novos conteúdos eram estudados durante as videoaulas.
+
+Durante o desenvolvimento, foram encontrados diversos erros de lógica e implementação. Entre os principais problemas estavam o funcionamento do menu de vendas e, posteriormente, o controle dos ingredientes utilizados na preparação dos produtos.
+
+Esses problemas foram importantes para compreender que desenvolver um sistema não significa apenas escrever código. Também é necessário **testar, identificar erros, entender suas causas e modificar a estrutura da solução quando necessário**.
+
+A utilização de funções permitiu separar melhor as responsabilidades do programa, enquanto listas e dicionários possibilitaram estruturar os dados. Posteriormente, o uso de arquivos CSV trouxe maior persistência às informações armazenadas pelo sistema.
+
+O principal aprendizado proporcionado pelo projeto foi justamente esse processo de evolução: **transformar uma ideia inicialmente estruturada em pseudocódigo em um sistema funcional, testar suas limitações, corrigir problemas e incorporar novos conhecimentos para melhorar a solução.**
+
+No final, conceitos que inicialmente foram estudados de forma isolada passaram a trabalhar juntos na construção de uma aplicação concreta para gerenciamento de clientes, produtos, vendas, pontos e estoques.
+
+---
+
+## Autor
+
+**Nicolas Paiva Ferreira**
+
+Projeto acadêmico desenvolvido em Python.
